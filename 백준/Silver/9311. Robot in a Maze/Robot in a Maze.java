@@ -1,5 +1,4 @@
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,8 +18,8 @@ public class Main {
 	            int C = Integer.parseInt(st.nextToken()); // columns, 예제 8
 	            
 	            char[][] maze = new char[R][C];
-	            int startX = -1, startY = -1; // 시작지점 초기화
-//	            int startX = 0, startY = 0;  // 0,0 이 시작점일 가능성 존재
+	            //int startX = -1, startY = -1; // 시작지점 초기화
+	            int startX = 0, startY = 0;  // 0,0 이 시작점일 가능성 존재
 	            
 	            for ( int j = 0; j < R; j++) {
 	                String line = br.readLine();
