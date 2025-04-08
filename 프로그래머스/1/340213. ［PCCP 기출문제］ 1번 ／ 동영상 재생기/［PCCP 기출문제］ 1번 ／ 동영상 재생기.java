@@ -1,56 +1,52 @@
 class Solution {
     public String solution(String video_len, String pos, String op_start, String op_end, String[] commands) {
-        // video_len, pos, op_start, op_end는 "mm:ss" 형식
-        // 이를 초 단위로 변환해서 연산하고 나중에 다시 "mm:ss" 형식으로 변환
-        
-        // video_len, pos, op_start, op_end를 초로 변환
-        int video_len_sec = timeToSeconds(video_len);
-        int pos_sec = timeToSeconds(pos);
-        int op_start_sec = timeToSeconds(op_start);
-        int op_end_sec = timeToSeconds(op_end);
-
-        // 오프닝 구간 건너뛰기
-            if (pos_sec >= op_start_sec && pos_sec <= op_end_sec) {
-                pos_sec = op_end_sec; // 오프닝 끝으로 이동
-            }
-        // 명령을 처리
-        for (String command : commands) {
-            if (command.equals("prev")) {
-                // 10초 전으로 이동
-                pos_sec -= 10;
-                if (pos_sec < 0) {
-                    pos_sec = 0; // 동영상 처음으로 이동
-                }
-            } else if (command.equals("next")) {
-                // 10초 후로 이동
-                pos_sec += 10;
-                if (pos_sec > video_len_sec) {
-                    pos_sec = video_len_sec; // 동영상 끝으로 이동
-                }
-            }
-
-            // 오프닝 구간 건너뛰기
-            if (pos_sec >= op_start_sec && pos_sec <= op_end_sec) {
-                pos_sec = op_end_sec; // 오프닝 끝으로 이동
-            }
-        }
-
-        // 결과를 "mm:ss" 형식으로 변환
-        return secondsToTime(pos_sec);
-    }
-
-    // "mm:ss" 형식의 시간을 초 단위로 변환하는 함수
-    private int timeToSeconds(String time) {
-        String[] parts = time.split(":");
-        int minutes = Integer.parseInt(parts[0]);
-        int seconds = Integer.parseInt(parts[1]);
-        return minutes * 60 + seconds;
-    }
-
-    // 초 단위의 시간을 "mm:ss" 형식으로 변환하는 함수
-    private String secondsToTime(int seconds) {
-        int minutes = seconds / 60;
-        int remainingSeconds = seconds % 60;
-        return String.format("%02d:%02d", minutes, remainingSeconds);
-    }
+		// 00:00 시간을 초단위로 변환
+		int video_len_s = minutesToSeconds(video_len);
+		int pos_s = minutesToSeconds(pos);
+		int op_start_s = minutesToSeconds(op_start);
+		int op_end_s = minutesToSeconds(op_end);
+		
+		// 현재 위치가 오프닝 구간일 경우 오프닝 끝 으로 이동
+		if ( pos_s >= op_start_s && pos_s <= op_end_s) {
+			pos_s = op_end_s;
+		}
+		
+		// next, prev 에 대한 수행
+		for ( String command : commands) {
+			if ( command.equals("prev")) {
+				pos_s -= 10; // prev 인 경우 10초 전으로 이동
+				if ( pos_s < 0 ) {
+					pos_s = 0; // 동영상 시작 시간인 0:0 이하면 0:0으로 이동
+				}
+			} else if ( command.equals("next")) {
+				pos_s += 10; // next 인 경우 10초 앞으로 이동
+				if ( pos_s > video_len_s) {
+					pos_s = video_len_s; // 현재 위치가 동영상 전체 길이를 벗어나면 동영상 끝으로 이동
+				}
+			}
+			
+			// 오프닝 구간일 경우 오프닝 끝 구간으로 이동
+			if ( pos_s >= op_start_s && pos_s <= op_end_s) {
+				pos_s = op_end_s;
+			}
+		}
+		
+		return secondsTominutes(pos_s); // 초 단위를 00: 00  으로 변환
+		
+	}
+	
+	// 00:00 시간에 대한 값을 초단위로 변환하는 함수
+	private int minutesToSeconds(String time) {
+		String[] a = time.split(":");
+		int minutes = Integer.parseInt(a[0]);
+		int seconds = Integer.parseInt(a[1]);
+		return minutes * 60 + seconds;
+	}
+	
+	// 초단위 시간을 분:초 로 변환하는 함수
+	private String secondsTominutes(int seconds) {
+		int minutes = seconds / 60;
+		int ssseconds = seconds % 60; // 초 나누기 60의 나머지가 초 의미 125초인 경우 2분 5초
+		return String.format("%02d:%02d", minutes, ssseconds);
+	}
 }
