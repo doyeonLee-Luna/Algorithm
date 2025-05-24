@@ -1,36 +1,31 @@
-import java.util.*;
+import java.util.HashMap;
 
-class Solution {
+public class Solution {
+
     public int[] solution(int N, int[] stages) {
-        // 1) 각 스테이지에 머물러 있는 사용자 수 집계
-        int[] challenger = new int[N + 2];              // N+1까지 인덱스를 쓰기 위해
-        for (int s : stages) {
-            challenger[s]++;
+        // ❶ 스테이지별 도전자 수를 구함
+        int[] challenger = new int[N + 2];
+        for (int i = 0; i < stages.length; i++) {
+            challenger[stages[i]] += 1;
         }
 
-        // 2) 스테이지별 실패율 계산
-        Map<Integer, Double> fails = new HashMap<>();
-        double total = stages.length;                   // 아직 도전 중인(=도달한) 전체 사용자 수
-        for (int level = 1; level <= N; level++) {
-            if (total == 0) {
-                // 더 이상 도달한 사용자 없으면 실패율 0
-                fails.put(level, 0.0);
-            } else {
-                // 실패율 = (머물러 있는 사람) / (도달한 사람)
-                double rate = challenger[level] / total;
-                fails.put(level, rate);
-                total -= challenger[level];             // 다음 레벨 도달자 수 갱신
+        // ❷ 스테이지별 실패한 사용자 수 계산
+        HashMap<Integer, Double> fails = new HashMap<>();
+        double total = stages.length;
+
+        // ❸ 각 스테이지를 순회하며, 실패율 계산
+        for (int i = 1; i <= N; i++) {
+            if (challenger[i] == 0) { // ❹ 도전한 사람이 없는 경우, 실패율은 0
+                fails.put(i, 0.);
+            }
+            else {
+                fails.put(i, challenger[i] / total); // ❺ 실패율 구함
+                total -= challenger[i]; // ❻ 다음 스테이지 실패율을 구하기 위해 현재 스테이지의 인원을 뺌
             }
         }
 
-        // 3) 실패율 내림차순, 스테이지 오름차순 정렬
-        return fails.entrySet().stream()
-            .sorted((e1, e2) -> {
-                int cmp = Double.compare(e2.getValue(), e1.getValue());  // 실패율 내림차순
-                if (cmp != 0) return cmp;
-                return Integer.compare(e1.getKey(), e2.getKey());        // 같은 실패율이면 스테이지 오름차순
-            })
-            .mapToInt(Map.Entry::getKey)
-            .toArray();
+        // ❼ 실패율이 높은 스테이지부터 내림차순으로 정렬
+        return fails.entrySet().stream().sorted((o1, o2) -> Double.compare(o2.getValue(), o1.getValue())).mapToInt(HashMap.Entry::getKey).toArray();
     }
+
 }
