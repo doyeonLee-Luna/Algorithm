@@ -11,8 +11,9 @@ class Solution {
                 stack.push(c);
             }
             else {
-                if(stack.isEmpty() || stack.pop() == c)
+                if(stack.isEmpty())
                     return false;
+                stack.pop();
             }
         }
 
